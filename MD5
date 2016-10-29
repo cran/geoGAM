@@ -1,0 +1,16 @@
+6a1e92d11eff0082458822e6121478cb *DESCRIPTION
+ffe43de694a4438366ea581258645d48 *NAMESPACE
+918088638d23bae6cdde5404f7336315 *NEWS
+89b30d6678b0f0d88ec1753e91e89432 *R/bootstrap.geogam.R
+2d649d80fdd7a9c5457ef7e2320ec29a *R/f.geoam.model.selection.R
+f914d7e561f7710ca0010a7f1742e7e2 *R/methods.geogam.R
+353e4baef7d9acef2360c23d11f3bb1c *R/predict.geogam.R
+fa26b7903741567feb078601ab1d8c7c *data/berne.grid.rda
+8ff92de6d96f23dd6523e6881972d21b *data/berne.rda
+0fcbad314613c50c66e8e95000244cff *data/datalist
+e9642493be4a38ac8557de0216d9d011 *man/berne.Rd
+e949c8f4fc57c87ba85daaee7ad0d8ff *man/berne.grid.Rd
+45ae74cc17be1da57a86fb70aa42cd65 *man/bootstrap.geoGAM.Rd
+f1ada93c90f82a983bedf29e9485beb4 *man/geoGAM.Rd
+9f25c9d060b3cab5c3cbc13a65722101 *man/methods.geoGAM.Rd
+f7c4131346b2afd6052d5694e6f12937 *man/predict.geoGAM.Rd

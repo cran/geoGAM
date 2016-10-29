@@ -1,0 +1,34 @@
+
+importFrom( parallel,  mclapply, detectCores ) 
+importFrom( "mboost", cv, gamboost, cvrisk, mstop, boost_control, Multinomial, glmboost, Binomial, Gaussian, PropOdds, extract, bspatial, bbs, bols)
+importFrom( "grpreg", cv.grpreg, grpreg )
+importFrom("graphics", "boxplot", "plot")
+importFrom("stats", "anova", "as.formula", "binomial", "coef",
+             "complete.cases", "drop.terms", "fitted", "formula",
+             "gaussian", "glm", "lm", "mad", "median", "model.frame",
+             "model.matrix", "predict", "quantile", "resid", "residuals",
+             "rnorm", "splinefun", "step", "t.test", "terms", "update")
+importFrom("utils", "capture.output", "str")
+importFrom( "MASS", polr )
+importFrom( "mgcv", gam, ocat)
+#importFrom( "raster", raster, writeRaster )
+
+# exported functions
+
+export(
+  geoGAM,
+  bootstrap
+)
+
+# exported methods
+
+S3method( plot, geoGAM  )
+S3method( summary, geoGAM  )
+S3method( print, geoGAM  )
+S3method( print, summary.geoGAM  )
+S3method( print, summary.path.geoGAM  )
+S3method( predict, geoGAM  )
+S3method( bootstrap, geoGAM  )
+
+
+
