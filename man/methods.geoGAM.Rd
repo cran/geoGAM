@@ -34,7 +34,7 @@ Methods for models fitted by \code{geoGAM()}.
 \code{summary} with \code{what = "final"} calls \code{\link{summary.gam}} to display a summary of the final (geo)additive model. \code{plot} with  \code{what = "final"} calls \code{\link{plot.gam}} to plot partial residual plots of the final model.
 
 \code{summary} with \code{what = "path"} give a summary of covariates selected in each step of model building.
-\code{plot} with \code{what = "path"} calls \code{\link{plot.mboost}} to plot the path of the gradient boosting algorithm.
+\code{plot} with \code{what = "path"} calls \code{plot.mboost} to plot the path of the gradient boosting algorithm.
 
 }
 \value{
@@ -62,8 +62,7 @@ For \code{what == "path"} summary returns a list of 13:
 }
 \references{
 %% ~put references to the literature/web site here ~
-Nussbaum, M., Papritz, A., and others (in prep). Mapping of soil properties at high resolution by
-geo-additive models.
+Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A., 2017a. Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL Discuss., https://www.soil-discuss.net/soil-2017-13/, in review.
 }
 \author{
 %%  ~~who you are~~

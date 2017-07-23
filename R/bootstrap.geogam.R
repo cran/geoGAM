@@ -31,8 +31,12 @@ bootstrap.geoGAM <- function( object,
     # 0) Take predictions from Boosting with Original Data
     l.fit <- fitted( object$gam.final )
 
-    # 1) Simulate new Observations, with f(x)_n
-    return( rnorm( l.fit*0, mean = l.fit, sd = t.sigma ) )
+    # 0) Standardize residuals according to Hinkely
+    mod.resid <- object$gam.final$residuals / sqrt( 1 - object$gam.final$hat )
+    mod.resid <- mod.resid - mean(mod.resid)
+
+    # 1) Simulate new Observations, with f(x)_n, page 262, Davison + Hinkley
+    return( l.fit + sample(mod.resid, length(l.fit), replace = T) )
 
   }
 

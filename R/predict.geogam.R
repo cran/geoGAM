@@ -114,15 +114,13 @@ predict.geoGAM <- function( object,
   # (true var(XBeta) probably larger, because model selection is ignored)
   if( back.transform == "log" ){
 
-    pred <- exp(pred$fit - pred$se.fit*0.5)
-
+    pred <- exp(pred$fit + object$gam.final$sig2*0.5 - pred$se.fit*0.5)
 
     # Backtransformation of SQRT
     # same approximation with Var(XBeta) from GAM object
   } else if( back.transform == "sqrt" ) {
 
-    pred <- pred$fit^2 - pred$se.fit
-
+    pred <- pred$fit^2 + object$gam.final$sig2 - pred$se.fit
 
     # for ordinal / binomial regression
     # create "category numbers" for integer raster

@@ -30,34 +30,37 @@ Method for class \code{geoGAM} to compute model based bootstrap for point predic
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
+Soil properties are predicted for new locations \eqn{\ensuremath{\mathbf{s_{+}}}}{s+} from the final \code{\link{geoGAM}} fit by \eqn{\tilde{Y}(\ensuremath{\mathbf{s_+}})=\hat f(\mathbf{x}\ensuremath{\mathbf{(s_+)}})}{Y(s+) = f(x(s+))}, see function \code{\link{predict.geoGAM}}.
+%
+	% bootstraped intervals
+	To model the predictive distributions for continuous responses \code{\link{bootstrap.geoGAM}} uses a
+	non-parametric, model-based bootstrapping approach (\cite{Davison and Hinkley 1997}, pp. 262, 285) as follows:
+	%
+\enumerate{
 
-To obtain predictive distribution for continuous responses \code{bootstrap} implements a model based bootstrap approach  (\cite{Davison-Hinkley-2008, pp. 262,	285}) for \code{geoGAM} models. Errors are simulated from Gaussian distribution with \code{R} repetitions involving the following steps:
+		\item New values of the response are simulated according to \eqn{Y(\ensuremath{\mathbf{s}})^{*} = \hat f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))+\ensuremath{\mathbf{\epsilon}}}{Y(s)* = f(x(s)) + epsilon}, where \eqn{\hat f(\mathbf{x}(\ensuremath{\mathbf{s}}))}{f(x(s))} are the fitted values of the final model
+		and \eqn{\epsilon}{epsilon} are errors randomly sampled with replacement from the centred, homoscedastic residuals of the final model \cite{Wood 2006}, p. 129).
 
-	\enumerate{
-		\item simulating new response \eqn{Y(s)^{*}}{Y(s)*} from Gaussian
-		distribution \eqn{\mathcal{N} (\hat f(\mathbf{x},s), \hat \sigma^2)}{NN(f(x,s), sigma^2)} with
-		fitted values of the final model \eqn{\hat f(\mathbf{x}, s)}{f(x,s)} and residual
-		variance \eqn{\hat \sigma^2}{sigma^2},
+		\item \code{\link{geoGAM}} is fitted to \eqn{Y(\ensuremath{\mathbf{s}})^{*}}{Y(s)*}.
 
-		\item selecting geoadditive model with \code{\link{geoGAM}} for
-		\eqn{Y(s)^{*}}{Y(s)*},
-
-		\item computing prediction error
-
-		\deqn{\sigma_{i}^{*} = \hat
-		f(\mathbf{x},s)^{*} - ( \hat f(\mathbf{x},s) + \mathcal{N} (0, \hat
-		\sigma^{*2}))}{sigma_i* = f(x,s)* - f(x,s) + NN(0, sigma*^2)}
-
-
-		with fitted values \eqn{\hat f(\mathbf{x},s)^{*}}{f(x,s)*} and
-		residual variance \eqn{\hat \sigma^{*2}}{sigma*^2} of the model built on the
-		simulated response \eqn{Y(s)^{*}}{Y(s)*}.
-    %
-		Simulated point predictions are then computed by \eqn{\hat f(\mathbf{x},s)^{*} - \sigma_{i}^{*}}{f(x,s)* - sigma_i*}.
+		\item Prediction errors are computed according to \eqn{\delta_{+}^{*} =  \hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}}))^{*} - (\, \hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}})) + \ensuremath{\mathbf{\epsilon}} \,)}{delta+* = f(x(s+))* - (f(x(s+))+epsilon)},
+		where \eqn{\hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}}))^{*}}{f(x(s+))*} are predicted values at new locations \eqn{\ensuremath{\mathbf{s_{+}}}}{s+} of the
+		model built with the simulated response \eqn{Y(\ensuremath{\mathbf{s}})^{*}}{Y(s)*} in step B above, and the errors \eqn{\epsilon}{epsilon} are again randomly sampled from the centred, homoscedastic residuals of the final model (see step A).
 }
 
-This results in a predictive distribution for each site. For \code{back.transform} = \code{log} or \code{sqrt} the simulated predictions are backtransformed after the steps above (see \code{\link{predict.geoGAM}} for more information).
-Prediction intervals can be achieved by computing the desired percentiles (e.g. 2.5 \% and 97.5 \% percentiles to get lower and upper limits of 95 \% prediction intervals.)
+	Prediction intervals are computed according to
+	%
+	\deqn{
+	[\hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+})}}) - \delta_{+\,(1-\alpha)}^{*}\,; \hat f(\mathbf{x}\ensuremath{\mathbf{(s_{+}}})) - \delta_{+\,(\alpha)}^{*}]}{
+	[f(x(s+)) - delta+*_(1-alpha); f(x(s+)) - delata+*_(alpha)]
+	}
+	%
+	where \eqn{\delta_{+\,(\alpha)}^{*}}{delta+*_(alpha)} and \eqn{\delta_{+\,(1-\alpha)}^{*}}{delta+*_(1-alpha)} are the \eqn{\alpha}{alpha}- and \eqn{(1-\alpha)}{(1-alpha)}-quantiles of \eqn{\delta_{+}^{*}}{delta+*}, pooled over all 1000 bootstrap repetitions.
+
+	Predictive distributions for binary and ordinal responses are
+	directly obtained from a final \code{\link{geoGAM}} fit by predicting probabilities
+	of occurrence \eqn{\mathrm{\widetilde{Prob}}(Y(\ensuremath{\mathbf{s}})=r\,|\,\mathbf{x}(\ensuremath{\mathbf{s)}})}{Prob((s) = r|x(s))}
+	(\cite{Davison and Hinkley 1997}, p. 358).
 
 }
 \value{
@@ -66,10 +69,9 @@ Data frame of \code{nrows(newdata)} rows and \code{R + 2} columns with \code{x} 
 }
 \references{
 %% ~put references to the literature/web site here ~
-Nussbaum, M., Papritz, A., and others (in prep). Mapping of soil properties at high resolution by
-geo-additive models.
+Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A., 2017a. Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL Discuss., https://www.soil-discuss.net/soil-2017-13/, in review.
 
-Davison, A. C. and Hinkley, D. V. 2008. Bootstrap Methods and Their Applications. Cambridge University Press.
+Davison, A. C. and Hinkley, D. V., 2008. Bootstrap Methods and Their Applications. Cambridge University Press.
 }
 \author{
 %%  ~~who you are~~

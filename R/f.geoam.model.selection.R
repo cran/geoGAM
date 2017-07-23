@@ -2010,20 +2010,20 @@ geoGAM <- function(
   }
 
 
-  # Backtransformed CV
-  if( grepl("^log\\.", resp) ){
-    fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( exp(fin.cv.f[[2]]$pred - fin.cv.f[[2]]$pred.se*0.5) )
-    fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^log\\.", "", resp)]
-  }
-  if( grepl("^sqrt.", resp) ){
-    fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( fin.cv.f[[2]]$pred^2 - fin.cv.f[[2]]$pred.se )
-    fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^sqrt.", "", resp)]
-  }
-  if( grepl( "^logit\\.", resp)) {
-    fin.cv.f[[2]]$pred.backtrnsf <- as.numeric(( exp(fin.cv.f[[2]]$pred) /
-                                                   (1 + exp(fin.cv.f[[2]]$pred)) )*100)
-    fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^logit\\.", "", resp)]
-  }
+#   # Backtransformed CV
+#   if( grepl("^log\\.", resp) ){
+#     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( exp(fin.cv.f[[2]]$pred - fin.cv.f[[2]]$pred.se*0.5) )
+#     fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^log\\.", "", resp)]
+#   }
+#   if( grepl("^sqrt.", resp) ){
+#     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( fin.cv.f[[2]]$pred^2 - fin.cv.f[[2]]$pred.se )
+#     fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^sqrt.", "", resp)]
+#   }
+#   if( grepl( "^logit\\.", resp)) {
+#     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric(( exp(fin.cv.f[[2]]$pred) /
+#                                                    (1 + exp(fin.cv.f[[2]]$pred)) )*100)
+#     fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^logit\\.", "", resp)]
+#   }
 
 
   #   # WARNING: this code is not generic for any dataset!!!
@@ -2044,18 +2044,18 @@ geoGAM <- function(
                                cal.data = data.sel, v.family = v.family,
                                se.fit = grepl("^log.|^sqrt.", resp), coords = coords)
 
-    if( grepl("^log\\.", resp) ){
-      l.val[[2]]$pred.backtrnsf <- as.numeric( exp(l.val[[2]]$pred - l.val[[2]]$se.pred*0.5) )
-      l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^log\\.", "", resp)]
-    }
-    if( grepl("^sqrt\\.", resp) ){
-      l.val[[2]]$pred.backtrnsf <- as.numeric( l.val[[2]]$pred^2 - l.val[[2]]$se.pred )
-      l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^sqrt\\.", "", resp)]
-    }
-    if( grepl( "^logit\\.", resp)) {
-      l.val[[2]]$pred.backtrnsf <- as.numeric(( exp(l.val[[2]]$pred) / (1 + exp(l.val[[2]]$pred)) )*100)
-      l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^logit\\.", "", resp)]
-    }
+#     if( grepl("^log\\.", resp) ){
+#       l.val[[2]]$pred.backtrnsf <- as.numeric( exp(l.val[[2]]$pred - l.val[[2]]$se.pred*0.5) )
+#       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^log\\.", "", resp)]
+#     }
+#     if( grepl("^sqrt\\.", resp) ){
+#       l.val[[2]]$pred.backtrnsf <- as.numeric( l.val[[2]]$pred^2 - l.val[[2]]$se.pred )
+#       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^sqrt\\.", "", resp)]
+#     }
+#     if( grepl( "^logit\\.", resp)) {
+#       l.val[[2]]$pred.backtrnsf <- as.numeric(( exp(l.val[[2]]$pred) / (1 + exp(l.val[[2]]$pred)) )*100)
+#       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^logit\\.", "", resp)]
+#     }
 
 
     #     # WARNING: this code is not generic for any dataset!!!

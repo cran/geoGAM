@@ -33,20 +33,35 @@ Takes a fitted \code{\link{geoGAM}} object and produces point predictions for a 
 %%  ~~ If necessary, more details than the description above ~~
 	Returns point predictions for new locations \eqn{s} from linear and smooth trends \eqn{\hat f(\mathbf{x},s)}{f(x,s)} estimated
 	by penalized least squares geoGAM by calling the function \code{\link{predict.gam}}.
-	For lognormal responses (\code{back.transform = 'log'}) unbiased
-	back transformation (\cite{Cressie 1993},p 135) was computed by
 
-  \deqn{ \tilde Y(s) = exp( \hat f(\mathbf{x}, s) - \frac{1}{2} \hat \sigma^2 ) }{
-  Y(s) = exp( f(x,s) - 1/2*sigma^2) }
+	\strong{Back transformation of log and sqrt}
 
-	with \eqn{\hat\sigma^2}{sigma^2} being the estimated variance of \eqn{\hat
-	f(\mathbf{x}, s)}{f(x,s)} (see \code{\link{predict.gam}} with \code{se.fit=TRUE}). For responses with square root transformation (\code{back.transform = 'sqrt'}) unbiased backtransform was computed by
+	For lognormal responses (\code{back.transform = 'log'}) in full analogy to lognormal kriging (\cite{Cressie-2006}, Eq. 20) the predictions are backtransformed by
+%
+\deqn{
+	\mathrm{E}[ Y(\ensuremath{\mathbf{s}})\,|\,\ensuremath{\mathbf{x}}] = \exp\left(~ \hat
+	f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}})) + \frac{1}{2} \hat \sigma^2 -
+	\frac{1}{2} \mbox{Var}[ \hat
+	f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}) ] \right)
+	}{E[Y(s)|x] = exp(f(x(s)) + sigma^2 - Var[f(x(s)])}
+%
+	with \eqn{\hat f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))}{f(x(s))} being the prediction of the log-transformed response,
+	\eqn{\hat \sigma^2}{sigma^2} the estimated residual variance of the final \code{\link{geoGAM}} fit (see \code{\link{predict.gam}} with \code{se.fit=TRUE}) and
+	\eqn{\mbox{Var}[ \hat f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}) ) ]}{Var[f(x(s)]} the variance of \eqn{\hat f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))}{f(x(s))} as provided again by the final \code{\link{geoGAM}}.
 
-	\deqn{
-	\tilde Y(s) = \hat f(\mathbf{x}, s)^2 - \hat \sigma^2 }{
-  Y(s) = f(x,s)^2 + sigma^2	}
+For responses with square root transformation (\code{back.transform = 'sqrt'}) unbiased backtransform is computed by (\cite{Nussbaum et al. 2017b})
+%
+\deqn{
+\tilde{Y}(s) = \hat{f}(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))^2 + \hat{\sigma}^2 - Var[ \hat{f}(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))]
+}{
+Y(s) = f(x(s))^2 + sigma^2 - Var[f(x(s))]
+}
+%
+with \eqn{\hat{f}(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))^2}{f(x(s))^2} being the prediction of the sqrt-transformed response, \eqn{\hat{\sigma}^2}{sigma^2} the estimated residual variance of the fitted model and \eqn{Var[ \hat{f}(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))]}{Var[f(x(s))]} the variance of \eqn{\hat{f}(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))}{f(x(s))} as provided again by \code{\link{geoGAM}}.
 
-  .\cr
+
+  \strong{Discretization of probability predictions}
+
 	For binary and ordered responses predictions yield
 	predicted occurrence probabilities \eqn{\tilde
 	P(Y(\mathbf{s})=\mathbf{r}|\mathbf{x},s)}{P(Y(s)=r|x,s)} for response classes \eqn{\mathbf{r}}{r}.
@@ -68,14 +83,15 @@ If \code{se.fit = TRUE} then a 2 item list is returned with items \code{fit} and
 }
 \references{
 %% ~put references to the literature/web site here ~
-Cressie, N. A. C. 1993. Statistics for Spatial Data, John Wiley \& Sons.
+Cressie, N. A. C., 1993. Statistics for Spatial Data, John Wiley \& Sons.
 
-Nussbaum, M., Papritz, A., and others (in prep). Mapping of soil properties at high resolution by
-geo-additive models.
+Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A., 2017a. Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL Discuss., https://www.soil-discuss.net/soil-2017-13/, in review.
 
-Tutz, G. 2012. Regression for Categorical Data, Cambridge University Press.
+Nussbaum, M., Spiess, K., Baltensweiler, A., Grob, U., Keller, A., Greiner, L., Schaepman, M. E., and Papritz, A., 2017b. Evaluation of digital soil mapping approaches with large sets of environmental covariates, SOIL Discuss., https://www.soil-discuss.net/soil-2017-14/, in review.
 
-Wilks, D. S. 2011. Statistical Methods in the Atmospheric Sciences, Academic Press.
+Tutz, G., 2012. Regression for Categorical Data, Cambridge University Press.
+
+Wilks, D. S., 2011. Statistical Methods in the Atmospheric Sciences, Academic Press.
 }
 \author{
 %%  ~~who you are~~

@@ -7,8 +7,8 @@ Berne -- soil mapping case study
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
-The Berne data set contains soil responses and a large set of explanatory covariates. The study area is located to the Northwest of the city of Berne and covers agricultural area.
-Soil responses included are soil pH (4 depth intervals calculated from pedogenetic horizon), drainage classes (3 ordered classes) and presence of waterlogging characteristics down to a specified depth (binary response).
+The Berne dataset contains soil responses and a large set of explanatory covariates. The study area is located to the Northwest of the city of Berne and covers agricultural area.
+Soil responses included are soil pH (4 depth intervals calculated from soil horizon), drainage classes (3 ordered classes) and presence of waterlogging characteristics down to a specified depth (binary response).
 
 Covariates cover environmental conditions by representing climate, topography, parent material and soil.
 
@@ -21,7 +21,7 @@ Covariates cover environmental conditions by representing climate, topography, p
       \item{\code{site_id_unique}}{ID of original profile sampling}
       \item{\code{x}}{easting, Swiss grid in m, EPSG: 21781 (CH1903/LV03)}
       \item{\code{y}}{northing, Swiss grid in m, EPSG: 21781 (CH1903/LV03)}
-      \item{\code{dataset}}{Factor splitting data set for \code{calibration} and independent \code{validation}. \code{validation} was assigned at random by using weights to ensure even spatial coverage of the agricultural area.}
+      \item{\code{dataset}}{Factor splitting dataset for \code{calibration} and independent \code{validation}. \code{validation} was assigned at random by using weights to ensure even spatial coverage of the agricultural area.}
       \item{\code{dclass}}{Drainage class, ordered Factor.}
       \item{\code{waterlog.30}}{Presence of waterlogging characteristics down to 30 cm (1: presence, 0: absence)}
       \item{\code{waterlog.50}}{Presence of waterlogging characteristics down to 50 cm (1: presence, 0: absence)}
@@ -262,7 +262,7 @@ Covariates cover environmental conditions by representing climate, topography, p
 %%  ~~ If necessary, more details than the __description__ above ~~
 \strong{Soil data}
 
-The soil data originates from various soil sampling campaigns since 1968. Most of the data was collected for traditional polygon soil maps in the 1970ties in the course of amelioration and farm land exchanges. As frequently observed in legacy soil data sampling site allocation followed a purposive sampling strategy identifying typical soils in an area in the course of polygon soil mapping.
+The soil data originates from various soil sampling campaigns since 1968. Most of the data was collected in conventional soil surveys in the 1970ties in the course of amelioration and farm land exchanges. As frequently observed in legacy soil data sampling site allocation followed a purposive sampling strategy identifying typical soils in an area in the course of polygon soil mapping.
 
 \bold{\code{dclass}} contains drainage classes of three levels.
 Swiss soil classification differentiates stagnic (I), gleyic (G) and anoxic/reduced (R) soil profile qualifiers with each 4, 6 resp. 5 levels. To reduce complexity the qualifiers  I, G and R  were aggregated to the degree of hydromorphic
@@ -272,7 +272,7 @@ Swiss soil classification differentiates stagnic (I), gleyic (G) and anoxic/redu
 \bold{\code{waterlog}} indicates the \emph{\code{presence}} or \emph{\code{absence}} of waterlogging characteristics down 30, 50 and 100 cm soil depth. The responses were based on horizon qualifiers \sQuote{gg} or \sQuote{r} of the Swiss classification (\cite{Brunner et al. 1997}) as those were considered to limit plant growth. A horizon was given the qualifier \sQuote{gg} if it was strongly gleyic predominantly oxidized (rich in \eqn{Fe^{3+}}{Fe^3+}) and \sQuote{r} if it was anoxic predominantly reduced (poor in \eqn{Fe^{3+}}{Fe^3+}).
 
 
-\bold{\code{pH}} was mostly sampled following genetic soil horizons. To ensure comparability between sites pH was transferred to fixed depth intervals of 0--10, 10--30, 30--50 and 50--100 cm by weighting soil horizons falling into a given interval. The data contains laboratory measurements that solved samples in \eqn{CaCl_{2}}{CaCl_2} or \eqn{H_{2}0}{H_2_0}. The latter were transferred to the level of \eqn{CaCl_{2}}{CaCl_2} measurements by univariate linear regression (label \code{ptf} in \emph{\code{timeset}}). Further, the data set contains estimates of pH in the field by an indicator solution (Hellige pH, label \code{field} in \emph{\code{timeset}}).
+\bold{\code{pH}} was mostly sampled following genetic soil horizons. To ensure comparability between sites pH was transferred to fixed depth intervals of 0--10, 10--30, 30--50 and 50--100 cm by weighting soil horizons falling into a given interval. The data contains laboratory measurements that solved samples in \eqn{CaCl_{2}}{CaCl_2} or \eqn{H_{2}0}{H_2_0}. The latter were transferred to the level of \eqn{CaCl_{2}}{CaCl_2} measurements by univariate linear regression (label \code{ptf} in \emph{\code{timeset}}). Further, the dataset contains estimates of pH in the field by an indicator solution (Hellige pH, label \code{field} in \emph{\code{timeset}}).
 The column \emph{\code{timeset}} can be used to partly correct for the long sampling period and the different sampling methods.
 
 
@@ -288,7 +288,7 @@ Each covariate name was given a prefix:
   \item \emph{\code{sl_}} covariates from an overview soil map
 }
 
-References to the used data sets can be found in \cite{Nussbaum et al. in prep}.
+References to the used datasets can be found in \cite{Nussbaum et al. 2017b}.
 
 }
 \references{
@@ -296,8 +296,7 @@ References to the used data sets can be found in \cite{Nussbaum et al. in prep}.
 Brunner, J., Jaeggli, F., Nievergelt, J., and Peyer, K. (1997). Kartieren und Beurteilen von Landwirtschaftsboeden.
 FAL Schriftenreihe 24, Eidgenoessische Forschungsanstalt fuer Agraroekologie und Landbau, Zuerich-Reckenholz (FAL).
 
-Nussbaum et al. (in prep). Comparison of statistical approaches for digital soil mapping.
-
+Nussbaum, M., Spiess, K., Baltensweiler, A., Grob, U., Keller, A., Greiner, L., Schaepman, M. E., and Papritz, A., 2017b. Evaluation of digital soil mapping approaches with large sets of environmental covariates, SOIL Discuss., https://www.soil-discuss.net/soil-2017-14/, in review.
 
 }
 \examples{
