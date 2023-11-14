@@ -2,12 +2,12 @@
 \alias{bootstrap.geoGAM}
 \alias{bootstrap}
 \alias{bootstrap.default}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{Bootstrapped predictive distribution
-%%  ~~function to do ... ~~
+
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+
 Method for class \code{geoGAM} to compute model based bootstrap for point predictions. Returns complete predictive distribution of which prediction intervals can be computed.
 }
 \usage{
@@ -18,7 +18,7 @@ Method for class \code{geoGAM} to compute model based bootstrap for point predic
           seed = NULL, cores = detectCores(), ...)
 
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{object}{geoGAM object}
   \item{newdata}{data frame in which to look for covariates with which to predict.}
@@ -29,8 +29,8 @@ Method for class \code{geoGAM} to compute model based bootstrap for point predic
   \item{...}{further arguments.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
-Soil properties are predicted for new locations \eqn{\ensuremath{\mathbf{s_{+}}}}{s+} from the final \code{\link{geoGAM}} fit by \eqn{\tilde{Y}(\ensuremath{\mathbf{s_+}})=\hat f(\mathbf{x}\ensuremath{\mathbf{(s_+)}})}{Y(s+) = f(x(s+))}, see function \code{\link{predict.geoGAM}}.
+
+Soil properties are predicted for new locations \eqn{\mathbf{s_{+}}}{s+} from the final \code{\link{geoGAM}} fit by \eqn{\tilde{Y}(\mathbf{s_+})=\hat f(\mathbf{x}\mathbf{(s_+)})}{Y(s+) = f(x(s+))}, see function \code{\link{predict.geoGAM}}.
 %
 	% bootstraped intervals
 	To model the predictive distributions for continuous responses \code{\link{bootstrap.geoGAM}} uses a
@@ -38,20 +38,20 @@ Soil properties are predicted for new locations \eqn{\ensuremath{\mathbf{s_{+}}}
 	%
 \enumerate{
 
-		\item New values of the response are simulated according to \eqn{Y(\ensuremath{\mathbf{s}})^{*} = \hat f(\ensuremath{\mathbf{x}}(\ensuremath{\mathbf{s}}))+\ensuremath{\mathbf{\epsilon}}}{Y(s)* = f(x(s)) + epsilon}, where \eqn{\hat f(\mathbf{x}(\ensuremath{\mathbf{s}}))}{f(x(s))} are the fitted values of the final model
+		\item New values of the response are simulated according to \eqn{Y(\mathbf{s})^{*} = \hat f(\mathbf{x}(\mathbf{s}))+\mathbf{\epsilon}}{Y(s)* = f(x(s)) + epsilon}, where \eqn{\hat f(\mathbf{x}(\mathbf{s}))}{f(x(s))} are the fitted values of the final model
 		and \eqn{\epsilon}{epsilon} are errors randomly sampled with replacement from the centred, homoscedastic residuals of the final model \cite{Wood 2006}, p. 129).
 
-		\item \code{\link{geoGAM}} is fitted to \eqn{Y(\ensuremath{\mathbf{s}})^{*}}{Y(s)*}.
+		\item \code{\link{geoGAM}} is fitted to \eqn{Y(\mathbf{s})^{*}}{Y(s)*}.
 
-		\item Prediction errors are computed according to \eqn{\delta_{+}^{*} =  \hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}}))^{*} - (\, \hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}})) + \ensuremath{\mathbf{\epsilon}} \,)}{delta+* = f(x(s+))* - (f(x(s+))+epsilon)},
-		where \eqn{\hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+}}}))^{*}}{f(x(s+))*} are predicted values at new locations \eqn{\ensuremath{\mathbf{s_{+}}}}{s+} of the
-		model built with the simulated response \eqn{Y(\ensuremath{\mathbf{s}})^{*}}{Y(s)*} in step B above, and the errors \eqn{\epsilon}{epsilon} are again randomly sampled from the centred, homoscedastic residuals of the final model (see step A).
+		\item Prediction errors are computed according to \eqn{\delta_{+}^{*} =  \hat f(\mathbf{x}(\mathbf{s_{+}}))^{*} - (\, \hat f(\mathbf{x}(\mathbf{s_{+}})) + \mathbf{\epsilon} \,)}{delta+* = f(x(s+))* - (f(x(s+))+epsilon)},
+		where \eqn{\hat f(\mathbf{x}(\mathbf{s_{+}}))^{*}}{f(x(s+))*} are predicted values at new locations \eqn{\mathbf{s_{+}}}{s+} of the
+		model built with the simulated response \eqn{Y(\mathbf{s})^{*}}{Y(s)*} in step B above, and the errors \eqn{\epsilon}{epsilon} are again randomly sampled from the centred, homoscedastic residuals of the final model (see step A).
 }
 
 	Prediction intervals are computed according to
 	%
 	\deqn{
-	[\hat f(\mathbf{x}(\ensuremath{\mathbf{s_{+})}}) - \delta_{+\,(1-\alpha)}^{*}\,; \hat f(\mathbf{x}\ensuremath{\mathbf{(s_{+}}})) - \delta_{+\,(\alpha)}^{*}]}{
+	[\hat f(\mathbf{x}(\mathbf{s_{+})}) - \delta_{+\,(1-\alpha)}^{*}\,; \hat f(\mathbf{x}\mathbf{(s_{+}})) - \delta_{+\,(\alpha)}^{*}]}{
 	[f(x(s+)) - delta+*_(1-alpha); f(x(s+)) - delata+*_(alpha)]
 	}
 	%
@@ -59,7 +59,7 @@ Soil properties are predicted for new locations \eqn{\ensuremath{\mathbf{s_{+}}}
 
 	Predictive distributions for binary and ordinal responses are
 	directly obtained from a final \code{\link{geoGAM}} fit by predicting probabilities
-	of occurrence \eqn{\mathrm{\widetilde{Prob}}(Y(\ensuremath{\mathbf{s}})=r\,|\,\mathbf{x}(\ensuremath{\mathbf{s)}})}{Prob((s) = r|x(s))}
+	of occurrence \eqn{\mathrm{\widetilde{Prob}}(Y(\mathbf{s})=r\,|\,\mathbf{x}(\mathbf{s)})}{Prob((s) = r|x(s))}
 	(\cite{Davison and Hinkley 1997}, p. 358).
 
 }
@@ -68,22 +68,22 @@ Soil properties are predicted for new locations \eqn{\ensuremath{\mathbf{s_{+}}}
 Data frame of \code{nrows(newdata)} rows and \code{R + 2} columns with \code{x} and \code{y} indicating coordinates of the location and \code{P1} to \code{P...R} the prediction at this location from \code{1...R} replications.
 }
 \references{
-%% ~put references to the literature/web site here ~
-Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A., 2017a. Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL Discuss., https://www.soil-discuss.net/soil-2017-13/, in review.
+
+Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A.: Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL, 3, 191-210, doi:10.5194/soil-3-191-2017, 2017.
 
 Davison, A. C. and Hinkley, D. V., 2008. Bootstrap Methods and Their Applications. Cambridge University Press.
 }
 \author{
-%%  ~~who you are~~
-Madlene Nussbaum, \email{madlene.nussbaum@env.ethz.ch}
+
+M. Nussbaum
 }
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+
 To create geoGAM objects see \code{\link{geoGAM}} and to predict without simulation of the predictive distribution see \code{\link{predict.geoGAM}}.
 }
 \examples{
 
-\dontrun{
+\donttest{
 data(quakes)
 
 # group stations to ensure min 20 observations per factor level
@@ -99,13 +99,14 @@ quakes.geogam <- geoGAM(response = "mag",
                         covariates = c("stations", "depth"),
                         coords = c("lat", "long"),
                         data = quakes,
-                        max.stop = 20)
+                        max.stop = 20,
+                        cores = 1)
 
 
-## compute model based bootstrap with 100 repetitions
+## compute model based bootstrap with 10 repetitions (use at least 100)
 quakes.boot <- bootstrap(quakes.geogam,
                          newdata = quakes.pred,
-                         R = 100)
+                         R = 10, cores = 1)
 
 
 # plot predictive distribution for site in row 9
@@ -119,7 +120,5 @@ abline(v = quant95[1], lty = "dashed")
 abline(v = quant95[2], lty = "dashed")
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ spatial }
-\keyword{ models & regression & nonlinear }% __ONLY ONE__ keyword per line
+\keyword{ models & regression & nonlinear }

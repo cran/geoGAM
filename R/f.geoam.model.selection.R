@@ -31,15 +31,15 @@ f.transform.data <- function( resp, data, val.data, coords ){
   # data.frame( no.transform = l.sub.num)
 
   fun.center <- function(x) { x.c <- (x - min(x) ) / ( max(x) - min(x))
-  x.sc <- scale(x.c, center = T, scale = F)[, 1]
+  x.sc <- scale(x.c, center = TRUE, scale = FALSE)[, 1]
   return(x.sc)
   }
-  data[, !l.sub.num ] <- lapply( data[, !l.sub.num, drop = F], FUN = fun.center)
+  data[, !l.sub.num ] <- lapply( data[, !l.sub.num, drop = FALSE], FUN = fun.center)
 
   # Center coordinates
   if( !is.null(coords)){
     data[, coords] <- data.frame(
-      scale(data[, coords], center = T, scale = F))
+      scale(data[, coords], center = TRUE, scale = FALSE))
   }
 
   # Add a separate intercept for boosting
@@ -60,18 +60,18 @@ f.transform.data <- function( resp, data, val.data, coords ){
       ( max(kali[, col]) - min(kali[, col]))
 
     # center with this mean
-    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = F)[, 1]
+    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = FALSE)[, 1]
     return(x.sc)
   }
 
   val.data[, !l.sub.num]  <- data.frame(
-    lapply( names(val.data[, !l.sub.num, drop = F]), FUN = fun.center.v) )
+    lapply( names(val.data[, !l.sub.num, drop = FALSE]), FUN = fun.center.v) )
 
   # Center coordinates with mean from calibration data
   if( !is.null(coords)){
     coord.means <-  colMeans( data.original[ , coords])
     val.data[, coords] <- data.frame(
-      scale( val.data[, coords], center = coord.means, scale = F))
+      scale( val.data[, coords], center = coord.means, scale = FALSE))
   }
 
   # Add intercept
@@ -89,7 +89,7 @@ f.transform.data <- function( resp, data, val.data, coords ){
 f.choose.offset <- function(resp, dat, t.sets, w.weights, v.family, verbose ){
 
   l.fact <- names(dat)[ unlist( lapply( dat, is.factor) ) == TRUE ]
-  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = T, value = T)
+  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = TRUE, value = TRUE)
 
   if( verbose > 1){ cat("\nFull list of factors: \n"); print(l.fact) }
 
@@ -102,7 +102,7 @@ f.choose.offset <- function(resp, dat, t.sets, w.weights, v.family, verbose ){
   if( v.family[[2]] != "PropOdds" ){
 
     # desig matrix without intercept
-    XX <- model.matrix( ~., dat[, l.fact, F])[,-1]
+    XX <- model.matrix( ~., dat[, l.fact, FALSE])[,-1]
     yy <- dat[, resp]
 
     # response needs to be integer with 0/1, use first level as = 0
@@ -130,7 +130,7 @@ f.choose.offset <- function(resp, dat, t.sets, w.weights, v.family, verbose ){
       # extract group numbers and list of chosen factors
       pp <- predict(g.cvfit, X = XX, which = idx.se, type = "groups",
                     lambda =  g.cvfit$lambda[ idx.se ])
-      l.off.fact <- l.fact[pp]
+      l.off.fact <- l.fact[as.numeric(pp)]
       f.fact.off <- paste(resp, " ~ ",paste(l.off.fact,collapse="+") )
 
       # create predictions for offset
@@ -147,7 +147,7 @@ f.choose.offset <- function(resp, dat, t.sets, w.weights, v.family, verbose ){
     # for speed reasons and because stepwise CV of LM is much better, propably.
 
     f.po <- as.formula( paste( resp, "~",  paste( l.fact, collapse =  " + ")) )
-    fit <- MASS::polr( f.po, data = dat, method = "logistic", model = T)
+    fit <- MASS::polr( f.po, data = dat, method = "logistic", model = TRUE)
     s.po <- step(fit, trace = 0, direction = "both", k = log(nrow(dat)))
 
     l.off.fact <- attr( s.po$terms, "term.labels")
@@ -172,16 +172,12 @@ f.lm <- function(formula, dat, v.family ){
     glm( as.formula(formula), data = dat, family = binomial(link= "logit"))
 
   } else if(v.family[[2]] == "PropOdds"){
-    polr(as.formula(formula), data = dat, method = "logistic", model = T)
-
-    #lm.p <- glmboost(formula, data = dat, family = PropOdds())
-    #lm.p[1000]
+    polr(as.formula(formula), data = dat, method = "logistic", model = TRUE)
 
   } else if(v.family[[2]] == "Multinomial"){
-    #     nnet::multinom(formula, dat, model = T)
 
   } else { # Gaussian
-    lm( formula, data = dat)#, singular.ok = F)
+    lm( formula, data = dat)
   }
 }
 
@@ -233,7 +229,7 @@ f.lm.cv <- function( lm.model, t.sets, resp, v.family, n.cores){
 
 
 # 2 stupid functions -> TODO replace by something more efficient!
-f.prepare.validation.cv <- function( dat, pred, resp, t.sets, gam.fit = 0, v.family, se.fit = F){
+f.prepare.validation.cv <- function( dat, pred, resp, t.sets, gam.fit = 0, v.family, se.fit = FALSE){
   # just take as t.fitted the one that is original response,
   # like that RMSE = BS
 
@@ -310,7 +306,7 @@ f.boost <- function( resp, dat, p.offset.lm, val.data, f.fact.off, v.family,
   sel.inter <- 1.2 # choose a bit less interactions
 
   l.fact <- names(dat)[ unlist( lapply( dat, is.factor) ) == TRUE ]
-  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = T, value = T)
+  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = TRUE, value = TRUE)
 
   l.num <- names(dat)[ unlist( lapply( dat, is.factor) ) == FALSE ]
 
@@ -330,7 +326,7 @@ f.boost <- function( resp, dat, p.offset.lm, val.data, f.fact.off, v.family,
   f.resp <- paste(resp, " ~ ")
 
   # Create Intercept separate
-  f.int <- paste( "bols(int, intercept = F, df = 1)", t.exp)
+  f.int <- paste( "bols(int, intercept = FALSE, df = 1)", t.exp)
 
   # Spatial Term
   if( !is.null(coords)) {
@@ -344,9 +340,9 @@ f.boost <- function( resp, dat, p.offset.lm, val.data, f.fact.off, v.family,
     if( length( levels(dat[, fact]) ) > 5) {
       if(length( levels(dat[, fact]) ) > 5 & v.family[[2]] == "Multinomial"){
         # factors cannot be fitted without intercept if nlevels > df*2 (?)
-        f.fact <- c(f.fact, paste(" bols(", fact, ", df = 5, intercept = T)", t.exp ))
+        f.fact <- c(f.fact, paste(" bols(", fact, ", df = 5, intercept = TRUE)", t.exp ))
       } else {
-        f.fact <- c(f.fact, paste(" bols(", fact, ", df = 5, intercept = F)", t.exp ))
+        f.fact <- c(f.fact, paste(" bols(", fact, ", df = 5, intercept = FALSE)", t.exp ))
       }
     } else {
       f.short <- c(f.short, fact)
@@ -375,14 +371,14 @@ f.boost <- function( resp, dat, p.offset.lm, val.data, f.fact.off, v.family,
 
       f.sh <- c( f.sh,
                  paste( "bols(", paste(f.short[1:(ii-1)], collapse = ", "),
-                        ", df = 5, intercept = F)", t.exp) )
+                        ", df = 5, intercept = FALSE)", t.exp) )
       # remove used factors
       f.short <- f.short[ -c(1:(ii-1)) ]
     }
     f.factor <- paste(  paste( f.sh, collapse = "+") ) # short level factors
 
   } else if( length(f.short) == 1){
-    f.factor <- paste(" bols(", f.short, ", df = 5, intercept = F)", t.exp )
+    f.factor <- paste(" bols(", f.short, ", df = 5, intercept = FALSE)", t.exp )
   } else {
     f.factor <- c()
   }
@@ -396,24 +392,24 @@ f.boost <- function( resp, dat, p.offset.lm, val.data, f.fact.off, v.family,
   f.num.bbs <- paste( "bbs(",
                       paste(
                         l.num[ -which( l.num %in% c(resp, coords, "int"))],
-                        collapse = paste(", center = F, df = 5)", t.exp, " + bbs("
+                        collapse = paste(", center = FALSE, df = 5)", t.exp, " + bbs("
                         )),
-                      ", center = F, df = 5)", t.exp,
+                      ", center = FALSE, df = 5)", t.exp,
                       sep = ""
   )
 
   # create Apex interaction for images 2014 and 2013
 
   # Numerische by Indikator bbs(); # bbs(x, by = z, df = 5)
-  l.apx <- grep( "apxb", l.num, value = T)
-  int.apx <- grep( "apxi", l.fact, value = T)
+  l.apx <- grep( "apxb", l.num, value = TRUE)
+  int.apx <- grep( "apxi", l.fact, value = TRUE)
   if( length( l.apx) > 0 ){
     f.num.bbs.apx <- paste( "bbs(",
                             paste(
                               l.apx,
-                              collapse = paste(", by=", int.apx, ", center = F, df = 5)", t.exp, " + bbs("
+                              collapse = paste(", by=", int.apx, ", center = FALSE, df = 5)", t.exp, " + bbs("
                               )),
-                            ", by=", int.apx, ", center = F, df = 5)", t.exp,
+                            ", by=", int.apx, ", center = FALSE, df = 5)", t.exp,
                             sep = ""
     )
     f.num.bbs <- paste(f.num.bbs, "+", f.num.bbs.apx)
@@ -515,7 +511,7 @@ f.comp.magn <- function( w, boost.obj ){ # w = baselearner-string
 
   # remove outliers to compute magnitude of residual plot
   # use definition of boxplot
-  outl <- boxplot(aa, plot = F)$out
+  outl <- boxplot(aa, plot = FALSE)$out
   bb.nout <- bb[ !aa %in% outl ]
 
   magn <- max(bb.nout)+abs(min(bb.nout) )
@@ -550,18 +546,18 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
     l.lin <- matrix(
       unlist(
         lapply(l.bbs, f.comp.magn, boost.obj = boost.object) ),
-      ncol = 2, byrow = T )
+      ncol = 2, byrow = TRUE )
 
     # selection probabilty for each
     l.selpr <- as.numeric( summary(boost.object)$selprob[
       match( l.bbs, attr( summary(boost.object)$selprob, "names") ) ] )
 
     df <- data.frame( name = l.bbs, selprob = l.selpr,
-                      linear = l.lin[,1], magnitude = l.lin[,2], stringsAsFactors = F)
+                      linear = l.lin[,1], magnitude = l.lin[,2], stringsAsFactors = FALSE)
   } else {
 
     df <- data.frame( name = character(), selprob = numeric(), linear = numeric(),
-                      magnitude = numeric(), stringsAsFactors = F)
+                      magnitude = numeric(), stringsAsFactors = FALSE)
   }
 
   # bols effektstaerke
@@ -574,7 +570,7 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
     bols.magn <- unlist( lapply( 1:length(l.bols), function(ii){
 
       # split in single factors (that were grouped by bols to reach 5 df)
-      l.f <- strsplit( gsub("bols\\(|intercept = F, df = 5\\)", "", l.bols[ii]), ", " )[[1]]
+      l.f <- strsplit( gsub("bols\\(|intercept = FALSE, df = 5\\)", "", l.bols[ii]), ", " )[[1]]
 
       # get coefficient values
       bla <- capture.output(
@@ -605,7 +601,7 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
 
     df.bols <- data.frame( name = names(bols.magn), selprob = rep(1, length(bols.magn)),
                            linear = rep(1, length(bols.magn)), magnitude = bols.magn,
-                           stringsAsFactors = F )
+                           stringsAsFactors = FALSE )
     rownames(df.bols) <- NULL
     df <- rbind( df, df.bols)
   }
@@ -630,13 +626,13 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
       return( magn )
     }) )
 
-    df.spat <- data.frame( name = l.bspat, magn.spat = bspat.magn, stringsAsFactors = F )
+    df.spat <- data.frame( name = l.bspat, magn.spat = bspat.magn, stringsAsFactors = FALSE )
     dim.1 <- unique( c( 0, as.numeric( round(quantile(df.spat$magn.spat, probs = seq(0,1,0.1)), 4) ) ) )
     dim.1[length(dim.1)] <- dim.1[length(dim.1)]*2
 
     # limit the number of magnitudes to cross validate
     if( length(dim.1) > 10 ){
-      dim.1 <- dim.1[ c(T,T,T,1:c(length(dim.1)-4) %% 2 == 0, T) ]
+      dim.1 <- dim.1[ c(TRUE,TRUE,TRUE,1:c(length(dim.1)-4) %% 2 == 0, TRUE) ]
     }
 
   } else{
@@ -655,14 +651,14 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
   if( length(dim.3) > 21 ){
     # do only limited number of cross validation models
     # first 15 steps of magnitude
-    dim.red <- sort(dim.3, decreasing = T)[c(1:10, 12, 14, 16, 18, 20)]
+    dim.red <- sort(dim.3, decreasing = TRUE)[c(1:10, 12, 14, 16, 18, 20)]
 
     # then only another 20 models.
     d <- ceiling( (length(dim.3) - 15) / 20 )
     idx <- cumsum(rep(d, 20))[ cumsum(rep(d, 10)) < (length(dim.3) - 15 )]
 
     dim.red <- c( dim.red,
-                  sort(dim.3, decreasing = T)[11:length(dim.3)][idx]
+                  sort(dim.3, decreasing = TRUE)[11:length(dim.3)][idx]
     )
     dim.3 <- c(0, sort( dim.red ))
   }
@@ -725,8 +721,8 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
   #     m.res.fin <- rbind( m.res.fin, m.res.lin)
   #   }
   #
-  #   d.res.fin <- data.frame( modell = l.modelle.lin, m.res.fin, stringsAsFactors =F )
-  d.res.fin <- data.frame( modell = l.modelle, m.res, stringsAsFactors = F)
+  #   d.res.fin <- data.frame( modell = l.modelle.lin, m.res.fin, stringsAsFactors =FALSE )
+  d.res.fin <- data.frame( modell = l.modelle, m.res, stringsAsFactors = FALSE)
   names(d.res.fin)[-1] <- l.names.coef
 
   d.cv.list <- d.res.fin[ !duplicated(d.res.fin[,-1]), ]
@@ -741,11 +737,11 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
 
     d.mod <- d.cv.list[l.row, ]
     l.baselearn  <- names(d.mod[,-1])[ d.mod[,-1] == 1 ]
-    l.baselearn.haupt <- l.baselearn[ grep( "by", l.baselearn, invert = T ) ]
+    l.baselearn.haupt <- l.baselearn[ grep( "by", l.baselearn, invert = TRUE ) ]
     l.baselearn.interact <- l.baselearn[ grep( "by", l.baselearn ) ]
 
     l.fact <- names(dat)[ unlist( lapply( dat, is.factor) ) == TRUE ]
-    l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = T, value = T)
+    l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = TRUE, value = TRUE)
 
 
     ### Check for degrees of freedom
@@ -757,7 +753,7 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
     # Number of spatial terms
     n.spat <- sum( grepl( "bspat", c( l.baselearn.haupt, l.baselearn.interact) ) )
     # Number of all factor levels
-    n.categ <- sum( unlist( lapply( dat[, l.fact, F], nlevels) ) )
+    n.categ <- sum( unlist( lapply( dat[, l.fact, FALSE], nlevels) ) )
     # Number of factor interaction
     n.inter <- 0
     if( length(l.fact) > 0 ){
@@ -775,8 +771,8 @@ f.tuning.param <- function( boost.object, dat, resp, non.stat, t.sets){
     # bbs interactions with numeric
     l.bbs.num <- 0
     for( bb in l.baselearn.interact[ grepl( "bbs", l.baselearn.interact) ] ) {
-      st <- strsplit( bb, split ="\\(|\\,|\\=", perl = T)[[1]][4]
-      st <- gsub(" ", "", st, fixed = T)
+      st <- strsplit( bb, split ="\\(|\\,|\\=", perl = TRUE)[[1]][4]
+      st <- gsub(" ", "", st, fixed = TRUE)
       l.bbs.num <- l.bbs.num +  ( match( st, l.fact , nomatch = 0 ) == 0 ) *16
     }
 
@@ -833,7 +829,7 @@ f.transform.formula <- function(
   # Add bbs that should be linearized
   for( baselearner in l.linear ){
     l.lin.haupt <- c(l.lin.haupt,
-                     strsplit( baselearner, split ="\\(|\\,", perl = T)[[1]][2])
+                     strsplit( baselearner, split ="\\(|\\,", perl = TRUE)[[1]][2])
   }
 
 
@@ -843,27 +839,27 @@ f.transform.formula <- function(
     # a) linear main effects (bols)
     if( grepl("bols", baselearner) == TRUE){
       l.lin.haupt <- c(l.lin.haupt,
-                       strsplit( baselearner, split ="\\(|\\,", perl = T)[[1]][2])
+                       strsplit( baselearner, split ="\\(|\\,", perl = TRUE)[[1]][2])
 
       # If several factors in one baselearner, take them all
-      len.fact <- length( strsplit( baselearner, split ="\\(|\\,", perl = T)[[1]] )
+      len.fact <- length( strsplit( baselearner, split ="\\(|\\,", perl = TRUE)[[1]] )
       if(  len.fact > 4 ){
         for( ii in  (len.fact-4) ){
           l.lin.haupt <- c(l.lin.haupt,
                            strsplit( baselearner,
-                                     split ="\\(|\\,", perl = T)[[1]][c(2+ii)])
+                                     split ="\\(|\\,", perl = TRUE)[[1]][c(2+ii)])
         }
       }
     }
 
     # b) splines main effects (bbs)
     if( grepl("bbs", baselearner) == TRUE){
-      b.name <- strsplit( baselearner, split = "\\(|\\,", perl = T)[[1]][2]
+      b.name <- strsplit( baselearner, split = "\\(|\\,", perl = TRUE)[[1]][2]
       name.new.h <- paste("s(", b.name, ", bs = 'ps', k = 16, m = c(3,2) )" )
       l.spli.haupt <- c( l.spli.haupt, name.new.h )
 
       # Extract lambdas from boosting
-      # Example: <- extract( bbs(daten$promitt, df = 5, center = F)$dpp(w.weights), what = "lambda")
+      # Example: <- extract( bbs(daten$promitt, df = 5, center = FALSE)$dpp(w.weights), what = "lambda")
       lambd <- extract( eval( parse( text = paste(
         sub( b.name, paste( "daten$", b.name, ", knots = 12", sep = ""), baselearner )
         , "$dpp(w.weights)", sep = ""))), what = "lambda" )
@@ -880,7 +876,7 @@ f.transform.formula <- function(
 
     # Add lambdas for spatial term
     l.sp <- extract( bspatial(daten[, coords[1]], daten[, coords[2]],
-                              df = 5, center = F, knots = 12)$dpp(w.weights), what = "lambda")
+                              df = 5, center = FALSE, knots = 12)$dpp(w.weights), what = "lambda")
     names( l.sp ) <- f.spat.haupt
     l.lambd.haupt <- c( l.lambd.haupt, rep(l.sp, 2))
 
@@ -893,18 +889,18 @@ f.transform.formula <- function(
 
     if( sum(grepl("bspat",baselearner)+grepl("by",baselearner)) == 2  ){
 
-      l.split <- strsplit( baselearner, split = "\\(|\\,|\\=", perl = T)[[1]]
+      l.split <- strsplit( baselearner, split = "\\(|\\,|\\=", perl = TRUE)[[1]]
       name.new <- paste("te(", paste(coords, collapse = ","), ", by = ", l.split[5],
                         ", bs = 'ps', k = 6, m = c(3,2))" )
       l.spat.inter <- c( l.spat.inter, name.new)
 
       # Extract lambdas from boosting
       # Example: extract( bbs(daten$promitt, by = dat$cp_ph,
-      #                   df = 5, center = F)$dpp(wei), what = "lambda")
+      #                   df = 5, center = FALSE)$dpp(wei), what = "lambda")
       # workaround, because of missinterpret of "eval", save covariates in new object
-      by.covar <- daten[ , gsub(" ", "", l.split[5], fixed = T)  ]
+      by.covar <- daten[ , gsub(" ", "", l.split[5], fixed = TRUE)  ]
       i.string <- paste0("bspatial(daten$", coords[1] ,
-                         ",daten$",coords[2],",by=by.covar,df=5,center=F,knots=6)$dpp(w.weights)")
+                         ",daten$",coords[2],",by=by.covar,df=5,center=FALSE,knots=6)$dpp(w.weights)")
 
       lambd <- extract( eval( parse( text = i.string ) ) , what = "lambda" )
       names(lambd) <- c( name.new )
@@ -933,7 +929,7 @@ f.transform.formula <- function(
 
     # a) linear effects (bols-interactions)
     if( grepl("bols", baselearner) == TRUE){
-      l.split <- strsplit( baselearner, split ="\\(|\\,|\\=", perl = T)[[1]]
+      l.split <- strsplit( baselearner, split ="\\(|\\,|\\=", perl = TRUE)[[1]]
 
       # if one partner is a factor, rename factor for later separate aggregation
       if(  is.factor(daten[, gsub(" ", "", l.split[4])] ) ){
@@ -948,18 +944,18 @@ f.transform.formula <- function(
 
     # b) splines effects (bbs-interactions)
     if( grepl("bbs", baselearner) == TRUE){
-      l.split <- strsplit( baselearner, split = "\\(|\\,|\\=", perl = T)[[1]]
+      l.split <- strsplit( baselearner, split = "\\(|\\,|\\=", perl = TRUE)[[1]]
       name.new <- paste("s(", l.split[2], ", by = ", l.split[4],
                         ", bs = 'ps', k = 16, m = c(3,2))" )
       l.spli.inter <- c( l.spli.inter, name.new)
 
       # Extract lambdas from boosting
       # Example: extract( bbs(daten$promitt, by = dat$cp_ph,
-      #                   df = 5, center = F)$dpp(w.weights), what = "lambda")
+      #                   df = 5, center = FALSE)$dpp(w.weights), what = "lambda")
       # workaround, because of missinterpret of "eval", save covariates in new object
       i.covar <- daten[ , l.split[2] ]
-      by.covar <- daten[ , gsub(" ", "", l.split[4], fixed = T)  ]
-      i.string <- "bbs(i.covar,by=by.covar,df=5,center=F,knots=12)$dpp(w.weights)"
+      by.covar <- daten[ , gsub(" ", "", l.split[4], fixed = TRUE)  ]
+      i.string <- "bbs(i.covar,by=by.covar,df=5,center=FALSE,knots=12)$dpp(w.weights)"
 
       lambd <- extract( eval( parse( text = i.string ) ) , what = "lambda" )
       names(lambd) <- c( name.new )
@@ -1014,8 +1010,8 @@ f.gam.find.drop <- function(
   # List of Elements in Formula
   l.terms <- strsplit( paste( formula(m.gam.full)[3]), "\\+")[[1]]
   # remove spaces and newLines
-  l.terms <- gsub(" ", "", l.terms, fixed = T)
-  l.terms <- gsub( "\n", "", l.terms, fixed = T)
+  l.terms <- gsub(" ", "", l.terms, fixed = TRUE)
+  l.terms <- gsub( "\n", "", l.terms, fixed = TRUE)
   # remove intercept
   l.terms <- l.terms[ !l.terms %in% c("1", "")]
 
@@ -1079,12 +1075,12 @@ f.gam.find.drop <- function(
           term.drop <- gsub("\\\n", "", term)
           f.terms <- terms(formula(m.gam.full))
           n.drop <- which(gsub(" ", "", attr(f.terms, "term.labels"),
-                               fixed = T) == term.drop)
+                               fixed = TRUE) == term.drop)
           f.form.0 <- formula( drop.terms( terms(formula(m.gam.full)),
-                                           dropx = n.drop, keep.response = T) )
+                                           dropx = n.drop, keep.response = TRUE) )
           # Drop lambdas
           l.lambd.0 <- m.gam.full$full.sp[ grep( p.sum$name.output[ term.ii ],
-                                                 names( m.gam.full$full.sp ), fixed = T, invert = T) ]
+                                                 names( m.gam.full$full.sp ), fixed = TRUE, invert = TRUE) ]
           # Compute Nullmodel
           weights <- m.gam.full$model$`(weights)`
           dat <- cbind(dat, weights)
@@ -1095,7 +1091,7 @@ f.gam.find.drop <- function(
           # No test possible (?)
           # use mean of drop.1-anova
           if( is.na( p.sum$p[ term.ii ]) ){
-            s.index <- grepl( p.sum$name.output[ term.ii ], attr( anova(m.gam.full)$chi.sq, "name" ), fixed = T )
+            s.index <- grepl( p.sum$name.output[ term.ii ], attr( anova(m.gam.full)$chi.sq, "name" ), fixed = TRUE )
             p.sum$p[ term.ii ] <- mean( anova(m.gam.full)$s.pv[ s.index ] )
           }
 
@@ -1147,9 +1143,9 @@ f.gam.find.drop <- function(
   l.red <- gsub("\\\n", "", l.red.original)
 
   f.terms <- terms(formula(m.gam.full))
-  n.drop <- which(gsub(" ", "", attr(f.terms, "term.labels"), fixed = T) == l.red)
+  n.drop <- which(gsub(" ", "", attr(f.terms, "term.labels"), fixed = TRUE) == l.red)
   f.drop <- formula( drop.terms( terms(formula(m.gam.full)),
-                                 dropx = n.drop, keep.response = T) )
+                                 dropx = n.drop, keep.response = TRUE) )
 
 
   # Remove lambda from list if smooth was removed
@@ -1161,7 +1157,7 @@ f.gam.find.drop <- function(
     # if interaction make grep (levels are appended to the name)
     if( grepl( ":", out.name ) ) {
       l.lambd.drop <- m.gam.full$full.sp[ grep( out.name,
-                                                names( m.gam.full$full.sp ), fixed = T, invert = T ) ]
+                                                names( m.gam.full$full.sp ), fixed = TRUE, invert = TRUE ) ]
     } else {
       l.lambd.drop <- m.gam.full$full.sp[ -match( out.name,
                                                   names( m.gam.full$full.sp ) ) ]
@@ -1198,11 +1194,11 @@ f.gam.find.drop <- function(
 
 # main CV function
 f.gam.cv <- function(gam.model, resp, t.sets, mult.gam = 0, v.family, n.cores,
-                     return.dat = F, se.fit = F){
+                     return.dat = FALSE, se.fit = FALSE){
 
   f.gam <- formula( gam.model )
   lambdas <- gam.model$full.sp
-  d.dat <- gam.model$model[, -match("(weights)", names(gam.model$model) ), drop = F]
+  d.dat <- gam.model$model[, -match("(weights)", names(gam.model$model) ), drop = FALSE]
   weights <- gam.model$model$`(weights)`
   d.dat <- cbind(d.dat, weights)
 
@@ -1213,7 +1209,7 @@ f.gam.cv <- function(gam.model, resp, t.sets, mult.gam = 0, v.family, n.cores,
   }
 
   my.cv.pred <- function(ii) {
-    d.dat <- gam.model$model[, -match("(weights)", names(gam.model$model) ), drop = F]
+    d.dat <- gam.model$model[, -match("(weights)", names(gam.model$model) ), drop = FALSE]
     weights <- gam.model$model$`(weights)`
     d.dat <- cbind(d.dat, weights)
     d.dat.cv <- d.dat[ which(t.ids != ii), ]
@@ -1225,7 +1221,7 @@ f.gam.cv <- function(gam.model, resp, t.sets, mult.gam = 0, v.family, n.cores,
     t.p <- predict( m.gam.cv, d.dat[ which(t.ids == ii),  ], type = "response")
     if( se.fit ){
       t.se <- predict( m.gam.cv, d.dat[ which(t.ids == ii),  ],
-                       type = "response", se.fit = T)$se.fit
+                       type = "response", se.fit = TRUE)$se.fit
       t.p <- data.frame( pred = t.p,  pred.se = t.se)}
     return(t.p)
   }
@@ -1405,8 +1401,8 @@ f.gam.aggregate.one <- function( gam.model, term, inter = NULL, t.sets, verbose 
     }
 
     # read levels with largest t-Test
-    l.ag1 <- l.lev[ which( m.t == max( m.t, na.rm = T), arr.ind = T )[1, "row"] ]
-    l.ag2 <- l.lev[ which( m.t == max( m.t, na.rm = T), arr.ind = T )[1, "col"] ]
+    l.ag1 <- l.lev[ which( m.t == max( m.t, na.rm = TRUE), arr.ind = TRUE )[1, "row"] ]
+    l.ag2 <- l.lev[ which( m.t == max( m.t, na.rm = TRUE), arr.ind = TRUE )[1, "col"] ]
 
     # Aggregate levels in data frame
     name.aggreg <- paste( l.ag1, l.ag2, sep = "--")
@@ -1456,7 +1452,7 @@ f.gam.aggregation.all <- function( gam.model, t.sets, verbose, resp, n.cores, v.
   # List of Elements in Formula
   l.terms <- strsplit( paste( formula(gam.model)[3]), "\\+")[[1]]
   # remove spaces
-  l.terms <- gsub(" ", "", l.terms, fixed = T)
+  l.terms <- gsub(" ", "", l.terms, fixed = TRUE)
   # remove intercept
   l.terms <- l.terms[ l.terms != "1"]
 
@@ -1523,7 +1519,7 @@ f.gam.aggregation.all <- function( gam.model, t.sets, verbose, resp, n.cores, v.
 
 ## --- Externe Validierung -----
 
-f.gam.val.extern <- function( gam.model, resp, val.data, cal.data, mult.gam = 0, v.family, se.fit = F, coords) {
+f.gam.val.extern <- function( gam.model, resp, val.data, cal.data, mult.gam = 0, v.family, se.fit = FALSE, coords) {
 
   val.data.original <- val.data
 
@@ -1548,19 +1544,19 @@ f.gam.val.extern <- function( gam.model, resp, val.data, cal.data, mult.gam = 0,
       ( max(kali[, col]) - min(kali[, col]))
 
     # center with this mean
-    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = F)[, 1]
+    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = FALSE)[, 1]
     return(x.sc)
   }
 
   val.data[, !l.sub.fact]  <- data.frame(
-    lapply( names(val.data[, !l.sub.fact, drop = F]), FUN = fun.center.v) )
+    lapply( names(val.data[, !l.sub.fact, drop = FALSE]), FUN = fun.center.v) )
 
 
   # Center coordinates with mean from calibration data
   if( !is.null(coords)){
     coord.means <-  colMeans( cal.data[ , coords])
     val.data[, coords] <- data.frame(
-      scale( val.data[, coords], center = coord.means, scale = F))
+      scale( val.data[, coords], center = coord.means, scale = FALSE))
   }
 
   # Add intercept
@@ -1602,7 +1598,7 @@ f.gam.val.extern <- function( gam.model, resp, val.data, cal.data, mult.gam = 0,
 
   pred <- predict( gam.model, newdata = val.dat.p, type = "response")
   if( se.fit ){
-    se.pred <- as.numeric( predict(gam.model, newdata = val.dat.p, type = "response", se.fit = T)$se.fit )
+    se.pred <- as.numeric( predict(gam.model, newdata = val.dat.p, type = "response", se.fit = TRUE)$se.fit )
   }
 
   t.val <- f.prepare.validation.ext(dat = resp, pred = pred, gam.fit = mult.gam, v.family = v.family)
@@ -1630,9 +1626,9 @@ geoGAM <- function(
   data,
   coords = NULL, #c("x", "y"),
   weights = rep(1, nrow(data)),
-  offset = T, # 0 = no offset, 1 = group lasso offset
+  offset = TRUE, # 0 = no offset, 1 = group lasso offset
   max.stop = 300,
-  non.stationary = F,
+  non.stationary = FALSE,
   sets = NULL,
   seed = NULL,
   validation.data = NULL,
@@ -1753,7 +1749,7 @@ geoGAM <- function(
   if( verbose > 2){ cat( "\n transformed data: \n \n"); print(str(data.trans)) }
 
   l.fact <- names(data.trans)[ unlist( lapply( data.trans, is.factor) ) == TRUE ]
-  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = T, value = T)
+  l.fact <- grep( paste0("^", resp, "$"), l.fact, invert = TRUE, value = TRUE)
 
   if(length(l.fact) == 0){ off.choice <- 3 }
 
@@ -1835,8 +1831,8 @@ geoGAM <- function(
 
 
 
-      l.baselearn.int <- l.baselearner[ grep( "by", l.baselearner, invert = F) ]
-      l.baselearn.haupt <- l.baselearner[ grep( "by", l.baselearner, invert = T) ]
+      l.baselearn.int <- l.baselearner[ grep( "by", l.baselearner, invert = FALSE) ]
+      l.baselearn.haupt <- l.baselearner[ grep( "by", l.baselearner, invert = TRUE) ]
       weights <- w.weights
 
       silent.Note <- capture.output(
@@ -1901,7 +1897,7 @@ geoGAM <- function(
     if( verbose > 0) {cat(" \n\nBaselearner after Tuning : \n")
       print( l.baselearner.fin) }
 
-    l.basel.h <- l.baselearner.fin[ grep( "by", l.baselearner.fin, invert = T) ]
+    l.basel.h <- l.baselearner.fin[ grep( "by", l.baselearner.fin, invert = TRUE) ]
     l.basel.h <- l.basel.h[ grepl("\\(", l.basel.h) ]
     l.basel.i <- l.baselearner.fin[ grep( "by", l.baselearner.fin)]
 
@@ -1912,7 +1908,7 @@ geoGAM <- function(
   } else{
     l.baselearner.fin <- t.boost[[1]]
 
-    l.basel.h <- l.baselearner.fin[ grep( "by", l.baselearner.fin, invert = T) ]
+    l.basel.h <- l.baselearner.fin[ grep( "by", l.baselearner.fin, invert = TRUE) ]
     l.basel.h <- l.basel.h[ grepl("\\(", l.basel.h) ]
     l.basel.i <- l.baselearner.fin[ grep( "by", l.baselearner.fin)]
 
@@ -1955,7 +1951,7 @@ geoGAM <- function(
 
   # if only one term left in formula, don't do backward selection
   l.terms <- strsplit( paste( formula(gam.full)[3]), "\\+")[[1]]
-  l.terms <- gsub(" ", "", l.terms, fixed = T); l.terms <- gsub( "\n", "", l.terms, fixed = T)
+  l.terms <- gsub(" ", "", l.terms, fixed = TRUE); l.terms <- gsub( "\n", "", l.terms, fixed = TRUE)
   l.terms <- l.terms[ !l.terms %in% c("1", "")]
 
 
@@ -1974,7 +1970,7 @@ geoGAM <- function(
 
   # List of Elements in Formula
   l.terms <- strsplit( paste( formula(gam.back[[2]])[3]), "\\+")[[1]]
-  l.terms <- gsub(" ", "", l.terms, fixed = T)
+  l.terms <- gsub(" ", "", l.terms, fixed = TRUE)
   l.terms <- l.terms[ l.terms != "" ]
   l.terms <- l.terms[ l.terms != "1"]
   l.terms <- l.terms[ !grepl("^s\\(|^te\\(", l.terms) ]
@@ -1993,14 +1989,14 @@ geoGAM <- function(
     gam.aggr[[2]] <- gam.back[[2]]
   }
 
-  if( grepl("^log\\.", resp) ){
+  if( grepl("^log\\.|^sqrt.|logit\\.", resp) ){
     fin.cv.f <- f.gam.cv(  gam.aggr[[2]],  resp = resp, t.sets = t.sets,
-                           v.family = v.family, n.cores = n.cores, return.dat = T,
+                           v.family = v.family, n.cores = n.cores, return.dat = TRUE,
                            se.fit = grepl("^log.|^sqrt.", resp) )
   }
 
   fin.cv <- f.gam.cv(  gam.aggr[[2]],  resp = resp, t.sets = t.sets,
-                       v.family = v.family, n.cores = n.cores, return.dat = T)
+                       v.family = v.family, n.cores = n.cores, return.dat = TRUE)
 
   if( verbose >= 1){ cat("\n \n9. Final Model ... \n ")
     print( summary( gam.aggr[[2]]))
@@ -2011,14 +2007,28 @@ geoGAM <- function(
 
 
 #   # Backtransformed CV
-#   if( grepl("^log\\.", resp) ){
-#     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( exp(fin.cv.f[[2]]$pred - fin.cv.f[[2]]$pred.se*0.5) )
-#     fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^log\\.", "", resp)]
-#   }
-#   if( grepl("^sqrt.", resp) ){
-#     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric( fin.cv.f[[2]]$pred^2 - fin.cv.f[[2]]$pred.se )
-#     fin.cv.f[[2]]$dat.backtrnsf <- calib.data[ , gsub("^sqrt.", "", resp)]
-#   }
+  if( grepl("^log\\.", resp) ){
+
+    fin.cv.f[[2]]$data.transf <- fin.cv.f[[2]]$data
+    fin.cv.f[[2]]$pred.transf <- fin.cv.f[[2]]$pred
+
+    fin.cv.f[[2]]$pred <- as.numeric( exp(fin.cv.f[[2]]$pred.transf -
+                                                      fin.cv.f[[2]]$pred.se*0.5) )
+    fin.cv.f[[2]]$data <- calib.data[ , gsub("^log\\.", "", resp)]
+
+    fin.cv <- fin.cv.f
+  }
+  if( grepl("^sqrt.", resp) ){
+
+    fin.cv.f[[2]]$data.transf <- fin.cv.f[[2]]$data
+    fin.cv.f[[2]]$pred.transf <- fin.cv.f[[2]]$pred
+
+    fin.cv.f[[2]]$pred <- as.numeric( fin.cv.f[[2]]$pred.transf^2 - fin.cv.f[[2]]$pred.se )
+    fin.cv.f[[2]]$data <- calib.data[ , gsub("^sqrt.", "", resp)]
+
+    fin.cv <- fin.cv.f
+
+  }
 #   if( grepl( "^logit\\.", resp)) {
 #     fin.cv.f[[2]]$pred.backtrnsf <- as.numeric(( exp(fin.cv.f[[2]]$pred) /
 #                                                    (1 + exp(fin.cv.f[[2]]$pred)) )*100)
@@ -2028,13 +2038,13 @@ geoGAM <- function(
 
   #   # WARNING: this code is not generic for any dataset!!!
   #   l.c <- ifelse( sum(grepl("timeset", names(calib.data))), c("site_id_unique", "timeset"), "site_id_unique")
-  #   fin.cv.f[[2]] <- cbind(calib.data[ ,l.c, drop = F], fin.cv.f[[2]])
-
-  if( grepl("^log\\.|^sqrt.|logit\\.", resp) ){
-    cat("\n--- computed on backtransformed response --- \n")
-    print( round( c( f.validate.predictions(d <- fin.cv.f[[2]]$dat.backtrnsf,
-                                            p <- fin.cv.f[[2]]$pred.backtrnsf, "st")), 5 ))
-  }
+  #   fin.cv.f[[2]] <- cbind(calib.data[ ,l.c, drop = FALSE], fin.cv.f[[2]])
+#
+#   if( grepl("^log\\.|^sqrt.|logit\\.", resp) ){
+#     cat("\n--- computed on backtransformed response --- \n")
+#     print( round( c( f.validate.predictions(d <- fin.cv.f[[2]]$dat.backtrnsf,
+#                                             p <- fin.cv.f[[2]]$pred.backtrnsf, "st")), 5 ))
+#   }
 
 
   if( !is.null(val.data)){
@@ -2044,14 +2054,22 @@ geoGAM <- function(
                                cal.data = data.sel, v.family = v.family,
                                se.fit = grepl("^log.|^sqrt.", resp), coords = coords)
 
-#     if( grepl("^log\\.", resp) ){
-#       l.val[[2]]$pred.backtrnsf <- as.numeric( exp(l.val[[2]]$pred - l.val[[2]]$se.pred*0.5) )
-#       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^log\\.", "", resp)]
-#     }
-#     if( grepl("^sqrt\\.", resp) ){
-#       l.val[[2]]$pred.backtrnsf <- as.numeric( l.val[[2]]$pred^2 - l.val[[2]]$se.pred )
-#       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^sqrt\\.", "", resp)]
-#     }
+    if( grepl("^log\\.", resp) ){
+
+      l.val[[2]]$dat.transf <-  l.val[[2]]$dat
+      l.val[[2]]$pred.transf <-  l.val[[2]]$pred
+
+      l.val[[2]]$pred <- as.numeric( exp(l.val[[2]]$pred.transf - l.val[[2]]$se.pred*0.5) )
+      l.val[[2]]$dat <- val.data.full[ , gsub("^log\\.", "", resp)]
+    }
+    if( grepl("^sqrt\\.", resp) ){
+
+      l.val[[2]]$dat.transf <-  l.val[[2]]$dat
+      l.val[[2]]$pred.transf <-  l.val[[2]]$pred
+
+      l.val[[2]]$pred <- as.numeric( l.val[[2]]$pred.transf^2 - l.val[[2]]$se.pred )
+      l.val[[2]]$dat <- val.data.full[ , gsub("^sqrt\\.", "", resp)]
+    }
 #     if( grepl( "^logit\\.", resp)) {
 #       l.val[[2]]$pred.backtrnsf <- as.numeric(( exp(l.val[[2]]$pred) / (1 + exp(l.val[[2]]$pred)) )*100)
 #       l.val[[2]]$dat.backtrnsf <- val.data.full[ , gsub("^logit\\.", "", resp)]
@@ -2060,14 +2078,15 @@ geoGAM <- function(
 
     #     # WARNING: this code is not generic for any dataset!!!
     #     l.c <- ifelse( sum(grepl("timeset", names(val.data.sel))), c("site_id_unique", "timeset"), "site_id_unique")
-    #     l.val[[2]] <- cbind(val.data.full[ ,l.c, drop = F], l.val[[2]])
+    #     l.val[[2]] <- cbind(val.data.full[ ,l.c, drop = FALSE], l.val[[2]])
 
     print( l.val[[1]] )
 
-    if( grepl("^log\\.|^sqrt.|logit\\.", resp) ){
-      cat("\n--- computed on backtransformed response --- \n")
-      print( round( c( f.validate.predictions(d <- l.val[[2]]$dat.backtrnsf, p <- l.val[[2]]$pred.backtrnsf, "st")), 5 ))
-    }
+    # if( grepl("^log\\.|^sqrt.|logit\\.", resp) ){
+    #   cat("\n--- computed on backtransformed response --- \n")
+    #   print( round( c( f.validate.predictions(d <- l.val[[2]]$dat.backtrnsf,
+    #                                           p <- l.val[[2]]$pred.backtrnsf, "st")), 5 ))
+    # }
 
 
   }

@@ -5,13 +5,12 @@
 \alias{summary}
 \alias{print}
 \alias{plot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+
 Methods for \code{geoGAM} objects
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+
 Methods for models fitted by \code{geoGAM()}.
 }
 \usage{
@@ -21,7 +20,7 @@ Methods for models fitted by \code{geoGAM()}.
 
 \method{plot}{geoGAM}(x, \dots, what = c("final", "path"))
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{object}{an object of class \code{geoGAM}}
   \item{x}{an object of class \code{geoGAM}}
@@ -30,7 +29,7 @@ Methods for models fitted by \code{geoGAM()}.
 }
 
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+
 \code{summary} with \code{what = "final"} calls \code{\link{summary.gam}} to display a summary of the final (geo)additive model. \code{plot} with  \code{what = "final"} calls \code{\link{plot.gam}} to plot partial residual plots of the final model.
 
 \code{summary} with \code{what = "path"} give a summary of covariates selected in each step of model building.
@@ -61,15 +60,15 @@ For \code{what == "path"} summary returns a list of 13:
 \item{list.gam.final}{list of covariate names in final model.}
 }
 \references{
-%% ~put references to the literature/web site here ~
-Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A., 2017a. Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL Discuss., https://www.soil-discuss.net/soil-2017-13/, in review.
+
+Nussbaum, M., Walthert, L., Fraefel, M., Greiner, L., and Papritz, A.: Mapping of soil properties at high resolution in Switzerland using boosted geoadditive models, SOIL, 3, 191-210, doi:10.5194/soil-3-191-2017, 2017.
 }
 \author{
-%%  ~~who you are~~
-Madlene Nussbaum, \email{madlene.nussbaum@env.ethz.ch}
+
+M. Nussbaum
 }
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+
 \code{\link{geoGAM}}, \code{\link{gam}}, \code{\link{predict.gam}}
 }
 \examples{
@@ -95,7 +94,5 @@ plot(quakes.geogam)
 plot(quakes.geogam, what = "path")
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ spatial }
-\keyword{ models & regression & nonlinear }% __ONLY ONE__ keyword per line
+\keyword{ models & regression & nonlinear }

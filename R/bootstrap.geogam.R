@@ -36,7 +36,7 @@ bootstrap.geoGAM <- function( object,
     mod.resid <- mod.resid - mean(mod.resid)
 
     # 1) Simulate new Observations, with f(x)_n, page 262, Davison + Hinkley
-    return( l.fit + sample(mod.resid, length(l.fit), replace = T) )
+    return( l.fit + sample(mod.resid, length(l.fit), replace = TRUE) )
 
   }
 
@@ -71,7 +71,7 @@ bootstrap.geoGAM <- function( object,
 
     } else {
 
-      pred.obj <- predict(boot.fit, newdata = newdata, se.fit = T, back.transform = back.transform)
+      pred.obj <- predict(boot.fit, newdata = newdata, se.fit = TRUE, back.transform = back.transform)
       new.dat.pred <- as.numeric(pred.obj$pred)
       new.dat.pred.se <- as.numeric(pred.obj$pred.se)
 
@@ -107,7 +107,7 @@ bootstrap.geoGAM <- function( object,
   }
 
 
-  pred.original <- predict( object, newdata = newdata, type = "response", se.fit = F, back.transform = "none" )
+  pred.original <- predict( object, newdata = newdata, type = "response", se.fit = FALSE, back.transform = "none" )
 
 
   ## compute residual standard error sigma
@@ -125,16 +125,16 @@ bootstrap.geoGAM <- function( object,
   #mc.reset.stream()
 
   # 1. simulate new responses
-  sim.resp <- mclapply(1:R, f.simulate.response, mc.allow.recursive = F,
+  sim.resp <- mclapply(1:R, f.simulate.response, mc.allow.recursive = FALSE,
                       mc.set.seed = TRUE, mc.cores = cores,
                       object = object, t.sigma = t.sigma)
 
   # 2. fit + predict
-  m.p.err <- mclapply(1:R, f.gam.model.fit.on.err, mc.allow.recursive = F,
+  m.p.err <- mclapply(1:R, f.gam.model.fit.on.err, mc.allow.recursive = FALSE,
                       mc.set.seed = FALSE, mc.cores = cores,
                       object = object, sim.resp = sim.resp, pred.original = pred.original)
 
-  d.dist <- matrix( unlist( m.p.err ), byrow = F, ncol = R )
+  d.dist <- matrix( unlist( m.p.err ), byrow = FALSE, ncol = R )
 
   d.dist  <- data.frame( cbind( newdata[, object$parameters$coords ], d.dist  ) )
   names(d.dist) <- c( object$parameters$coords, paste0("P", 1:R) )

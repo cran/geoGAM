@@ -2,11 +2,11 @@
 \alias{berne.grid}
 \docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
+
 Berne -- very small extract of prediction grid
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+
 The Berne grid dataset contains values of spatial covariates on the nodes of a 20 m grid. The dataset is intended for spatial continouous predictions of soil properties modelled from the sampling locations in \code{\link{berne}} dataset.
 }
 \usage{data("berne")}
@@ -245,7 +245,7 @@ The Berne grid dataset contains values of spatial covariates on the nodes of a 2
   }
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+
 Due to CRAN file size restrictions the grid for spatial predictions only shows a very small excerpt of the original study area.
 
 The environmental covariates for prediction of soil properties from dataset \code{\link{berne}} were extracted at the nodes of a 20 m grid. For higher resolution geodata sets no averaging over the area of the 20x20 pixel was done. \code{Berne.grid} therefore has the same spatial support for each covariate as \code{\link{berne}}.
@@ -254,23 +254,12 @@ For more information on the environmental covariates see \code{\link{berne}}.
 
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
-Nussbaum, M., Spiess, K., Baltensweiler, A., Grob, U., Keller, A., Greiner, L., Schaepman, M. E., and Papritz, A., 2017b. Evaluation of digital soil mapping approaches with large sets of environmental covariates, SOIL Discuss., https://www.soil-discuss.net/soil-2017-14/, in review.
 
+Nussbaum, M., Spiess, K., Baltensweiler, A., Grob, U., Keller, A., Greiner, L., Schaepman, M. E., and Papritz, A.: Evaluation of digital soil mapping approaches with large sets of environmental covariates, SOIL, 4, 1-22, doi:10.5194/soil-4-1-2018, 2018.
 }
 \examples{
 
-\dontrun{
 data(berne.grid)
 
-# plot spatial object
-library(raster)
-
-coordinates(berne.grid) <- ~x+y
-proj4string(berne.grid) <- CRS("+init=epsg:21781")
-gridded(berne.grid) <- TRUE
-
-plot( raster(berne.grid, layer = "tr_se_mrrtf2m"))
-}
 }
 \keyword{datasets}

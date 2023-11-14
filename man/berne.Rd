@@ -2,11 +2,9 @@
 \alias{berne}
 \docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
 Berne -- soil mapping case study
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
 The Berne dataset contains soil responses and a large set of explanatory covariates. The study area is located to the Northwest of the city of Berne and covers agricultural area.
 Soil responses included are soil pH (4 depth intervals calculated from soil horizon), drainage classes (3 ordered classes) and presence of waterlogging characteristics down to a specified depth (binary response).
 
@@ -259,7 +257,6 @@ Covariates cover environmental conditions by representing climate, topography, p
 }
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
 \strong{Soil data}
 
 The soil data originates from various soil sampling campaigns since 1968. Most of the data was collected in conventional soil surveys in the 1970ties in the course of amelioration and farm land exchanges. As frequently observed in legacy soil data sampling site allocation followed a purposive sampling strategy identifying typical soils in an area in the course of polygon soil mapping.
@@ -292,7 +289,6 @@ References to the used datasets can be found in \cite{Nussbaum et al. 2017b}.
 
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
 Brunner, J., Jaeggli, F., Nievergelt, J., and Peyer, K. (1997). Kartieren und Beurteilen von Landwirtschaftsboeden.
 FAL Schriftenreihe 24, Eidgenoessische Forschungsanstalt fuer Agraroekologie und Landbau, Zuerich-Reckenholz (FAL).
 

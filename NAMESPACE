@@ -11,24 +11,20 @@ importFrom("stats", "anova", "as.formula", "binomial", "coef",
 importFrom("utils", "capture.output", "str")
 importFrom( "MASS", polr )
 importFrom( "mgcv", gam, ocat)
-#importFrom( "raster", raster, writeRaster )
-
-# exported functions
-
-export(
-  geoGAM,
-  bootstrap
-)
+# importFrom( "raster", raster, writeRaster )
 
 # exported methods
+S3method( plot, geoGAM)
+S3method( summary, geoGAM)
+S3method( print, geoGAM)
+S3method( print, summary.geoGAM)
+S3method( print, summary.path.geoGAM)
+S3method( predict, geoGAM)
+S3method( bootstrap, default)
+S3method( bootstrap, geoGAM)
 
-S3method( plot, geoGAM  )
-S3method( summary, geoGAM  )
-S3method( print, geoGAM  )
-S3method( print, summary.geoGAM  )
-S3method( print, summary.path.geoGAM  )
-S3method( predict, geoGAM  )
-S3method( bootstrap, geoGAM  )
-
+# exported functions
+export(geoGAM)
+export(bootstrap)
 
 

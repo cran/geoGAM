@@ -11,7 +11,7 @@ predict.geoGAM <- function( object,
                             type = c("response", "link", "probs", "class"),
                             back.transform = c("none", "log", "sqrt"),
                             threshold = 0.5,
-                            se.fit = F, ...) {
+                            se.fit = FALSE, ...) {
 
 
 
@@ -24,12 +24,12 @@ predict.geoGAM <- function( object,
 
 
   # Transformed calibration data
-  daten <-  object$gam.final$model[, -match("(weights)", names(object$gam.final$model)), drop = F ]
+  daten <-  object$gam.final$model[, -match("(weights)", names(object$gam.final$model)), drop = FALSE ]
 
-  l.fact <- gsub("ag$", "", names(daten[,-1,drop = F])[ unlist( lapply( daten[,-1, drop = F], is.factor) )  ] )
-  l.no.fact <- names(daten[,-1,drop = F])[ !unlist( lapply( daten[,-1, drop = F], is.factor) )  ]
+  l.fact <- gsub("ag$", "", names(daten[,-1,drop = FALSE])[ unlist( lapply( daten[,-1, drop = FALSE], is.factor) )  ] )
+  l.no.fact <- names(daten[,-1,drop = FALSE])[ !unlist( lapply( daten[,-1, drop = FALSE], is.factor) )  ]
 
-  newdata <- newdata[ , c(object$parameters$coords, l.fact, l.no.fact) , drop = F]
+  newdata <- newdata[ , unique(c(object$parameters$coords, l.fact, l.no.fact)) , drop = FALSE]
 
   ## Transform the data like the original data set
   # Scale numerical data to [0;1], then center (- mean), but not the response
@@ -48,13 +48,13 @@ predict.geoGAM <- function( object,
       ( max(kali[, col]) - min(kali[, col]))
 
     # center with this mean
-    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = F)[, 1]
+    x.sc <- scale(x.c, center = mean( x.kali.m ), scale = FALSE)[, 1]
     return(x.sc)
   }
 
   if( length(l.sub.fact) > 0){
     newdata[, !l.sub.fact]  <- data.frame(
-      lapply( names(newdata[, !l.sub.fact, drop = F]), FUN = fun.center.v,
+      lapply( names(newdata[, !l.sub.fact, drop = FALSE]), FUN = fun.center.v,
               daten = daten, vali = newdata, kali = object$data) )
   }
 
@@ -62,7 +62,7 @@ predict.geoGAM <- function( object,
   if( !is.null(object$parameters$coords)){
     coord.means <-  colMeans( object$data[ , object$parameters$coords])
     newdata[, object$parameters$coords] <- data.frame(
-      scale( newdata[, object$parameters$coords], center = coord.means, scale = F))
+      scale( newdata[, object$parameters$coords], center = coord.means, scale = FALSE))
   }
 
   # Add intercept (and an alibi SE)
@@ -75,7 +75,7 @@ predict.geoGAM <- function( object,
   }
 
   ##  Aggregate factors accordingly
-  l.factors <- names( daten[,-1, drop = F] )[ unlist( lapply( daten[, -1, drop = F], is.factor ) ) ]
+  l.factors <- names( daten[,-1, drop = FALSE] )[ unlist( lapply( daten[, -1, drop = FALSE], is.factor ) ) ]
 
   for( fact in l.factors ){
 
@@ -102,7 +102,7 @@ predict.geoGAM <- function( object,
   }
 
 
-  se.fit <- ifelse( back.transform != "none", T, se.fit)
+  se.fit <- ifelse( back.transform != "none", TRUE, se.fit)
   type.pr <- ifelse( type %in% c("probs", "class"), "response", type)
 
   # normal untranformed Gaussian prediction

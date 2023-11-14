@@ -52,7 +52,7 @@ summary.geoGAM <- function(object, ..., what = c("final", "path")){
 
             t.final <- names(object$gam.final$model)[
               -match(c(object$parameters$response, "(weights)"), names(object$gam.final$model) )]
-            t.f <- unlist(lapply(object$gam.final$model[, t.final, drop = F], is.factor))
+            t.f <- unlist(lapply(object$gam.final$model[, t.final, drop = FALSE], is.factor))
             t.final[t.f] <- gsub("ag$", "", t.final[t.f])
 
             tt <- capture.output(
@@ -134,7 +134,7 @@ print.summary.path.geoGAM <- function(x, ... ){
   for( ll in 1:length( object$list.aggregation )){
     cat("\n* For factor '", names(object$list.aggregation[ll]), "' ",
         t.n <- sum(grepl("--",  object$list.aggregation[[ll]]) ), " level(s) aggregated")
-    if( t.n > 0) cat(": \n ", grep("--",  object$list.aggregation[[ll]], value = T)  )
+    if( t.n > 0) cat(": \n ", grep("--",  object$list.aggregation[[ll]], value = TRUE)  )
   }}
 
   cat("\n---\nCovariates chosen for final model:\n")
